@@ -1,0 +1,62 @@
+<html>
+  <head>
+    <title>DMV Waiting List Estimator</title>
+    <style>
+    body {font-family: sans-serif}
+    </style>
+    <script src='http://ajax.googleapis.com/libs/ajax/jquery/1.4.2/jquery.min.js'></script>
+
+    <script>
+      var estimate = function () {
+        var hashtag = $('#hashtag').val();
+        var number  = Number($('#number').val());
+
+        $('#result').text ('Gathering data and producing estimate...');
+
+        // Use the Twitter API to query for the numbers.
+        $.getJSON ('http://search.twitter.com/search.json?q=' + escape (hashtag), function (results) {
+          var results_within_hour = [];
+          var match               = null;
+          for (var i = 0, l = results.results.length; i < l; ++i)
+            if (new Date().getTime() - Date.parse (results.results[i].created_at) < 3600 * 1000 &&
+                (match = /^\s*(\d+)\s+#/.exec (results.results[i].text)))
+              results_within_hour.push ({number: match[1], time: Date.parse (results.results[i].created_at)});
+
+          // Take the minimum and maximum values and find the rate.
+          var first  = results_within_hour[0];
+          var middle = results_within_hour[results_within_hour.length >> 1];
+          var last   = results_within_hour[results_within_hour.length - 1];
+
+          var dt = (last.time   - first.time) / 60000;  // In minutes
+          var dn =  last.number - first.number;
+
+          var rate = dn / dt;
+          var time = (new Date().getTime() - first.time) / 60000;       // Also in minutes
+          var diff = number - first.number;
+
+          var expected = diff / rate * time;
+
+          $('#result').text ('Your expected wait is ' + (expected >>> 0) + ' minutes.');
+        });
+      };
+    </script>
+  </head>
+
+  <body>
+    <h1>Wait Estimator</h1>
+    <p>This application estimates your wait if you are in a numbered queue. To provide data, tweet the current number on a Twitter channel.
+       For example, if the current number at the Boulder DMV office is 904, you would tweet <code>904 #boulderdmv</code>.</p>
+
+    <p>To compute your wait, enter the Twitter hashtag and your number. Based on the tweets that you and others have provided, the amount of time left
+       will be estimated in a few seconds.</p>
+
+    <p>Keep in mind that this estimate is exact; if you are worried about missing your appointment, you should arrive early. It is only an
+       estimate, not a guarantee; so it is possibly inaccurate.</p>
+
+    <table><tr><td>Twitter hashtag (e.g. <code>#boulderdmv</code>): </td><td><input id='hashtag'></input></td></tr>
+           <tr><td>Your number: </td><td><input id='number'></input></td></tr></table>
+    <button onclick='estimate()'>Estimate</button>
+
+    <div id='result'></div>
+  </body>
+</html>
