@@ -1,6 +1,6 @@
 <html>
   <head>
-    <title>DMV Waiting List Estimator</title>
+    <title>Waiting List Estimator</title>
     <style>
     body {font-family: sans-serif}
     </style>
@@ -19,7 +19,7 @@
           var match               = null;
           for (var i = 0, l = results.results.length; i < l; ++i)
             if (new Date().getTime() - Date.parse (results.results[i].created_at) < 3600 * 1000 &&
-                (match = /^\s*(\d+)\s+#/.exec (results.results[i].text)))
+                (match = /^\s*(\d+)\s*#/.exec (results.results[i].text)))
               results_within_hour.push ({number: match[1], time: Date.parse (results.results[i].created_at)});
 
           // Take the minimum and maximum values and find the rate.
