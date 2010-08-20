@@ -61,7 +61,7 @@
             var conservative_rate = stat ('Conservative rate estimate', average_rate + standard_deviation);
 
             var last                 = results_within_hour[results_within_hour.length - 1];
-            var distance_to_travel   = stat ('Distance', number - last.number);
+            var distance_to_travel   = stat ('Distance', number - (last.number + 1));
             var time_already_elapsed = stat ('Elapsed', new Date().getTime() - last.time);
 
             var total_time_given_rate = function (rate) {
