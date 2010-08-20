@@ -11,21 +11,29 @@
         var hashtag = $('#hashtag').val();
         var number  = Number($('#number').val());
 
+        var clear   = $('#statistics').text('');
+        var stat    = function () {
+          $('#statistics').text ($('#statistics').text() + '\n' + Array.prototype.slice.call (arguments).join (' '));
+          return arguments[arguments.length - 1];
+        };
+
         $('#result').text ('Gathering data and producing estimate...');
         $('#estimate').hide();
 
         var lookup = function () {
           $.getJSON ('http://search.twitter.com/search.json?q=' + escape (hashtag) + '&callback=?', function (results) {
+            clear ();
+
             var results_within_hour = [];
             var match               = null;
             for (var i = 0, l = results.results.length; i < l; ++i)
               if (new Date().getTime() - Date.parse (results.results[i].created_at) < 3600 * 1000 &&
                   (match = /^\s*(\d+)\s*#/.exec (results.results[i].text)))
-                results_within_hour.push ({number: match[1], time: Date.parse (results.results[i].created_at)});
+                results_within_hour.push ({number: stat ('Found number', match[1]),
+                                             time: stat ('At time', Date.parse (results.results[i].created_at))});
 
             results_within_hour.sort (function (x, y) {
-              var xd = Date.parse (x.created_at), yd = Date.parse (y.created_at);
-              return xd < yd ? -1 : xd > yd ? 1 : 0;
+              return x.time < y.time ? -1 : x.time > y.time ? 1 : 0;
             });
 
             var rate_between = function (i1, i2) {
@@ -36,22 +44,22 @@
             // Get an average and variance for the different time estimates that exist.
             var estimated_rates = [];
             for (var i = 0, l = results_within_hour.length - 1; i < l; ++i)
-              estimated_rates.push (rate_between (i, i + 1));
+              estimated_rates.push (stat ('Micro-rate (dn/dt)', rate_between (i, i + 1)));
 
             var sqr          = function (x) {return x * x};
-            var average_rate = rate_between (0, results_within_hour.length - 1);
+            var average_rate = stat ('Macro-rate (dn/dt)', rate_between (0, results_within_hour.length - 1));
             var variance     = 0;
 
             for (var i = 0, l = estimated_rates.length; i < l; ++i)
-              variance += sqr (estimated_rates[i] - average_rate);
+              stat ('Accumulated variance', variance += sqr (estimated_rates[i] - average_rate));
 
-            variance /= estimated_rates.length;
+            stat ('Final variance', variance /= estimated_rates.length);
 
-            var conservative_rate = average_rate + 2 * variance;
+            var conservative_rate = stat ('Conservative rate estimate', average_rate + 2 * variance);
 
             var last                 = results_within_hour[results_within_hour.length - 1];
-            var distance_to_travel   = number - last.number;
-            var time_already_elapsed = new Date().getTime() - last.time;
+            var distance_to_travel   = stat ('Distance', number - last.number);
+            var time_already_elapsed = stat ('Elapsed', new Date().getTime() - last.time);
 
             var total_time_given_rate = function (rate) {
               return distance_to_travel / rate - time_already_elapsed;
@@ -88,5 +96,8 @@
     <button id='estimate' onclick='estimate()'>Estimate</button>
 
     <div id='result'></div>
+
+    <h1>Statistical Stuff</h1>
+    <pre id='statistics'></pre>
   </body>
 </html>
