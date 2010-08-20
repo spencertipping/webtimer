@@ -11,6 +11,8 @@
         var hashtag = $('#hashtag').val();
         var number  = Number($('#number').val());
 
+        $('input').attr('disabled', 'disabled');
+
         var clear   = function () {$('#statistics').text('')};
         var stat    = function () {
           $('#statistics').text ($('#statistics').text() + '\n' + Array.prototype.slice.call (arguments).join (' '));
