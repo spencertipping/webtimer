@@ -39,7 +39,7 @@
 
             var expected_time = diff * rate;
 
-            $('#result').text ('Your expected wait is ' + (expected - time >>> 0) + ' minutes.');
+            $('#result').text ('Your expected wait is ' + (expected - time >> 0) + ' minutes.');
           });
         }, 10000);
       };
