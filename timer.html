@@ -14,7 +14,7 @@
         $('#result').text ('Gathering data and producing estimate...');
 
         // Use the Twitter API to query for the numbers.
-        $.getJSON ('http://search.twitter.com/search.json?q=' + escape (hashtag), function (results) {
+        $.getJSON ('http://search.twitter.com/search.json?q=' + escape (hashtag) + '&callback=?', function (results) {
           var results_within_hour = [];
           var match               = null;
           for (var i = 0, l = results.results.length; i < l; ++i)
