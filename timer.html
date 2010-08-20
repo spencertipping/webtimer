@@ -11,7 +11,7 @@
         var hashtag = $('#hashtag').val();
         var number  = Number($('#number').val());
 
-        var clear   = $('#statistics').text('');
+        var clear   = function () {$('#statistics').text('')};
         var stat    = function () {
           $('#statistics').text ($('#statistics').text() + '\n' + Array.prototype.slice.call (arguments).join (' '));
           return arguments[arguments.length - 1];
