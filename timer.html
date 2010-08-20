@@ -23,7 +23,7 @@
                   (match = /^\s*(\d+)\s*#/.exec (results.results[i].text)))
                 results_within_hour.push ({number: match[1], time: Date.parse (results.results[i].created_at)});
 
-            results_with_hour.sort (function (x, y) {
+            results_within_hour.sort (function (x, y) {
               var xd = Date.parse (x.created_at), yd = Date.parse (y.created_at);
               return xd < yd ? -1 : xd > yd ? 1 : 0;
             });
