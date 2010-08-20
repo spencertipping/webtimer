@@ -72,7 +72,8 @@
             var conservative_estimate = total_time_given_rate (conservative_rate) / 60000;
 
             $('#result').text ('The current number is ' + last.number + ', and your expected wait is ' + (average_estimate >> 0) + ' minutes. ' +
-                               'To be on the safe side, you should probably allow for only ' + (conservative_estimate >> 0) + ' minutes.');
+                               'To be on the safe side, you should probably allow for only ' + (conservative_estimate >> 0) + ' minutes. ' +
+                               'Over the past hour, the average progress has been ' + (average_rate * 60000) + ' people per minute.');
           });
         };
 
