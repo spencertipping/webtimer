@@ -28,22 +28,40 @@
               return xd < yd ? -1 : xd > yd ? 1 : 0;
             });
 
-            // Take the minimum and maximum values and find the rate.
-            var first  = results_within_hour[0];
-            var middle = results_within_hour[results_within_hour.length >> 1];
-            var last   = results_within_hour[results_within_hour.length - 1];
+            var rate_between = function (i1, i2) {
+              var r1 = results_within_hour[i1] || i1, r2 = results_within_hour[i2] || i2;
+              return (r2.number - r1.number) / (r2.time - r1.time);
+            };
 
-            var dt = (last.time   - first.time) / 60000;  // In minutes
-            var dn =  last.number - first.number;
+            // Get an average and variance for the different time estimates that exist.
+            var estimated_rates = [];
+            for (var i = 0, l = results_within_hour.length - 1; i < l; ++i)
+              estimated_rates.push (rate_between (i, i + 1));
 
-            // Now that we have the rate, we can project how far out the user's number is likely to be.
-            var rate = dn / dt;
-            var time = (new Date().getTime() - first.time) / 60000;       // Also in minutes
-            var diff = number - first.number;
+            var sqr          = function (x) {return x * x};
+            var average_rate = rate_between (0, results_within_hour.length - 1);
+            var variance     = 0;
 
-            var expected = diff * rate;
+            for (var i = 0, l = estimated_rates.length; i < l; ++i)
+              variance += sqr (estimated_rates[i] - average_rate);
 
-            $('#result').text ('Your expected wait is ' + (expected - time >> 0) + ' minutes.');
+            variance /= estimated_rates.length;
+
+            var conservative_rate = average_rate + 2 * variance;
+
+            var last                 = results_within_hour[results_within_hour.length - 1];
+            var distance_to_travel   = number - last.number;
+            var time_already_elapsed = new Date().getTime() - last.time;
+
+            var total_time_given_rate = function (rate) {
+              return distance_to_travel / rate - time_already_elapsed;
+            };
+
+            var average_estimate      = total_time_given_rate (average_rate) / 60000;
+            var conservative_estimate = total_time_given_rate (conservative_rate) / 60000;
+
+            $('#result').text ('The current number is ' + last.number + ', and your expected wait is ' + (average_estimate >> 0) + ' minutes.' +
+                               'To be on the safe side, you should probably allow for only ' + (conservative_estimate >> 0) + ' minutes.');
           });
         };
 
