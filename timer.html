@@ -37,7 +37,7 @@
             var time = (new Date().getTime() - first.time) / 60000;       // Also in minutes
             var diff = number - first.number;
 
-            var expected_time = diff * rate;
+            var expected = diff * rate;
 
             $('#result').text ('Your expected wait is ' + (expected - time >> 0) + ' minutes.');
           });
