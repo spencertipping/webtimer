@@ -8,8 +8,10 @@
 
     <script>
       var estimate = function () {
-        var hashtag = $('#hashtag').val();
-        var number  = Number($('#number').val());
+        var hashtag = $('#hashtag').val().toLowerCase().replace (/^\s*/, '').replace (/\s*$/, '');
+        var number  = Number($('#number').val().replace (/^\s*/, '').replace (/\s*$/, ''));
+
+        /^#/.test(hashtag) || (hashtag = '#' + hashtag);
 
         $('input').attr('disabled', 'disabled');
 
