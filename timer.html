@@ -54,8 +54,9 @@
               stat ('Accumulated variance', variance += sqr (estimated_rates[i] - average_rate));
 
             stat ('Final variance', variance /= estimated_rates.length);
+            var standard_deviation = stat ('SD', Math.sqrt (variance));
 
-            var conservative_rate = stat ('Conservative rate estimate', average_rate + 2 * variance);
+            var conservative_rate = stat ('Conservative rate estimate', average_rate + 2 * standard_deviation);
 
             var last                 = results_within_hour[results_within_hour.length - 1];
             var distance_to_travel   = stat ('Distance', number - last.number);
